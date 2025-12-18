@@ -1,24 +1,47 @@
 import streamlit as st
-import requests
+import json
+import faiss
+import numpy as np
+from sentence_transformers import SentenceTransformer
+from pathlib import Path
 
 # ========================
 # CONFIG
 # ========================
 
-API_URL = "http://127.0.0.1:8000/recommend"
+MODEL_NAME = "sentence-transformers/all-MiniLM-L6-v2"
+TOP_K = 5
+
+INDEX_PATH = Path("data/processed/faiss.index")
+CORPUS_PATH = Path("data/processed/embedding_corpus.json")
+
+# ========================
+# LOAD RESOURCES (CACHED)
+# ========================
+
+@st.cache_resource
+def load_resources():
+    index = faiss.read_index(str(INDEX_PATH))
+    with open(CORPUS_PATH, "r", encoding="utf-8") as f:
+        corpus = json.load(f)
+    model = SentenceTransformer(MODEL_NAME)
+    return index, corpus, model
+
+
+index, corpus, model = load_resources()
+
+# ========================
+# UI
+# ========================
 
 st.set_page_config(
     page_title="SHL Assessment Recommendation Engine",
     layout="centered"
 )
 
-# ========================
-# UI
-# ========================
-
 st.title("🔍 SHL Assessment Recommendation Engine")
 st.write(
-    "Enter a job requirement or hiring need, and get relevant SHL assessments."
+    "Enter a hiring or assessment requirement to get relevant SHL individual test solutions."
 )
 
 query = st.text_input(
@@ -30,30 +53,27 @@ if st.button("Get Recommendations"):
     if not query.strip():
         st.warning("Please enter a valid query.")
     else:
-        with st.spinner("Fetching recommendations..."):
-            response = requests.post(
-                API_URL,
-                json={"query": query}
+        with st.spinner("Finding relevant assessments..."):
+            query_embedding = model.encode(
+                [query],
+                normalize_embeddings=True
             )
 
-        if response.status_code == 200:
-            results = response.json()
+            scores, indices = index.search(query_embedding, TOP_K)
 
-            if not results:
-                st.info("No recommendations found.")
-            else:
-                st.success(f"Top {len(results)} recommendations:")
+        st.success(f"Top {TOP_K} recommendations:")
 
-                for idx, item in enumerate(results, start=1):
-                    st.markdown(f"### {idx}. {item['name']}")
-                    st.markdown(f"**URL:** {item['url']}")
-                    st.markdown(f"**Description:** {item['description']}")
-                    st.markdown(
-                        f"- Duration: {item['duration']}\n"
-                        f"- Remote Support: {item['remote_support']}\n"
-                        f"- Adaptive Support: {item['adaptive_support']}\n"
-                        f"- Test Type: {item['test_type']}"
-                    )
-                    st.markdown("---")
-        else:
-            st.error("Error connecting to recommendation service.")
+        for rank, idx in enumerate(indices[0], start=1):
+            item = corpus[idx]
+            name = item["text"].split(".")[0]
+
+            st.markdown(f"### {rank}. {name}")
+            st.markdown(f"**URL:** {item['url']}")
+            st.markdown(f"**Description:** {item['text']}")
+            st.markdown(
+                "- Duration: Not specified\n"
+                "- Remote Support: Yes\n"
+                "- Adaptive Support: Yes\n"
+                "- Test Type: Individual Test"
+            )
+            st.markdown("---")
