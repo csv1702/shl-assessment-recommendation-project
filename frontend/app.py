@@ -12,7 +12,7 @@ from pathlib import Path
 MODEL_NAME = "sentence-transformers/all-MiniLM-L6-v2"
 TOP_K = 5
 
-INDEX_PATH = Path("data/processed/faiss.index")
+EMBEDDINGS_PATH = Path("data/processed/embeddings.npy")
 CORPUS_PATH = Path("data/processed/embedding_corpus.json")
 
 # ========================
@@ -21,10 +21,21 @@ CORPUS_PATH = Path("data/processed/embedding_corpus.json")
 
 @st.cache_resource
 def load_resources():
-    index = faiss.read_index(str(INDEX_PATH))
+    # Load embeddings
+    embeddings = np.load(EMBEDDINGS_PATH)
+
+    # Build FAISS index dynamically (cross-platform safe)
+    dim = embeddings.shape[1]
+    index = faiss.IndexFlatIP(dim)
+    index.add(embeddings)
+
+    # Load corpus
     with open(CORPUS_PATH, "r", encoding="utf-8") as f:
         corpus = json.load(f)
+
+    # Load embedding model
     model = SentenceTransformer(MODEL_NAME)
+
     return index, corpus, model
 
 
