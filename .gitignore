@@ -3,7 +3,7 @@ venv/
 
 # Data (large / generated)
 data/raw/
-data/processed/
+# data/processed/
 data/embeddings/
 
 # Secrets

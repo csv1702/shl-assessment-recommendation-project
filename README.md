@@ -14,6 +14,7 @@ The solution includes:
 - REST API (as per SHL Appendix-2)
 - Simple web frontend for testing
 - Submission-ready prediction output
+- Live Deployed Link to FrontEnd- "https://shl-assessment-recommendation-project-aurkcstwfmzrusbhelr9yy.streamlit.app/"
 
 ---
 
