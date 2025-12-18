@@ -1,25 +1,17 @@
-# Core
 numpy
 pandas
 tqdm
 
-# Web scraping
 requests
 beautifulsoup4
 
-# NLP & embeddings
 sentence-transformers
 faiss-cpu
+torch
 
-# API
 fastapi
 uvicorn
 
-# LLM
-google-generativeai
-
-# Frontend
 streamlit
 
-# Evaluation
 scikit-learn
