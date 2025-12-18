@@ -12,8 +12,11 @@ from pathlib import Path
 MODEL_NAME = "sentence-transformers/all-MiniLM-L6-v2"
 TOP_K = 5
 
-EMBEDDINGS_PATH = Path("data/processed/embeddings.npy")
-CORPUS_PATH = Path("data/processed/embedding_corpus.json")
+BASE_DIR = Path(__file__).resolve().parents[1]
+
+EMBEDDINGS_PATH = BASE_DIR / "data" / "processed" / "embeddings.npy"
+CORPUS_PATH = BASE_DIR / "data" / "processed" / "embedding_corpus.json"
+
 
 # ========================
 # LOAD RESOURCES (CACHED)
