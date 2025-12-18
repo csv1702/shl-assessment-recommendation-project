@@ -1,59 +1,39 @@
-```markdown
 # 📘 SHL Assessment Recommendation Engine
 
 ## Overview
 
-This project implements an **end-to-end Assessment Recommendation Engine** using **SHL’s product catalogue**, developed as part of the **SHL AI Intern – Generative AI Assignment**.
+This project implements an **end-to-end Assessment Recommendation Engine** using **SHL’s product catalogue**.
 
-The system accepts a **natural-language hiring or assessment requirement** and returns a **ranked list of relevant SHL individual test solutions** using **semantic search and vector similarity**.
+The system accepts a **natural-language hiring or assessment requirement** and returns a ranked list of **relevant SHL individual test solutions**, using **semantic search and vector similarity**.
 
-### Key Capabilities
+The solution includes:
 
 - Live crawling of SHL assessment catalogue
-- Semantic embedding and vector-based retrieval
+- Semantic embedding and vector search
 - Objective evaluation using labeled data
-- REST API compliant with **SHL Appendix-2**
-- Simple web frontend for interactive testing
-- Submission-ready prediction output (Appendix-3 compliant)
-
----
-
-## Table of Contents
-
-- [System Architecture](#system-architecture)
-- [Technologies Used](#technologies-used)
-- [Data Collection](#data-collection)
-- [Embedding & Retrieval](#embedding--retrieval)
-- [Evaluation](#evaluation-labeled-train-data)
-- [Test Set Predictions](#test-set-predictions)
-- [REST API](#rest-api-appendix-2)
-- [Web Frontend](#web-frontend)
-- [Project Structure](#project-structure)
-- [How to Run](#how-to-run-quick-start)
-- [Future Improvements](#future-improvements)
-- [Conclusion](#conclusion)
-- [Author](#author)
+- REST API (as per SHL Appendix-2)
+- Simple web frontend for testing
+- Submission-ready prediction output
 
 ---
 
 ## System Architecture
+
 ```
-
 User Query
-↓
+   ↓
 Sentence Transformer (Embeddings)
-↓
+   ↓
 FAISS Vector Index
-↓
+   ↓
 Top-K Relevant SHL Assessments
-↓
+   ↓
 FastAPI API → Streamlit Frontend
-
 ```
 
 ---
 
-## Technologies Used
+## Key Technologies Used
 
 - **Python 3.10**
 - **Sentence Transformers** (`all-MiniLM-L6-v2`)
@@ -62,7 +42,7 @@ FastAPI API → Streamlit Frontend
 - **Streamlit** (frontend UI)
 - **Pandas / NumPy**
 - **Requests**
-- **BeautifulSoup** (web crawling)
+- **BeautifulSoup** (for crawling)
 
 ---
 
@@ -70,45 +50,34 @@ FastAPI API → Streamlit Frontend
 
 ### SHL Catalogue Crawling
 
-- The SHL product catalogue was **crawled directly from the SHL website**
-- Only **Individual Test Solutions** were included
-- **Pre-packaged Job Solutions** were explicitly excluded (as required)
+- The SHL product catalogue was crawled directly from the SHL website.
+- Only **Individual Test Solutions** were considered.
+- **Pre-packaged Job Solutions were explicitly excluded**, as required.
 
-📊 **Total Individual Test Solutions Collected:** `264`
+📊 **Total Individual Test Solutions Collected:** **264**
 
-⚠️ **Note on Data Coverage**
-While the assignment specifies a target of **377+ assessments**, the SHL website’s public structure limits discoverability of certain assessments.
-The crawler was intentionally designed to avoid:
-- Invalid URLs
-- Duplicate entries
-- Non-assessment pages
-
-This limitation is transparently acknowledged and discussed in the accompanying approach document.
+> ⚠️ _Note:_ While the assignment specifies a target of 377+, the SHL website structure limits discoverability of some assessments through public catalogue endpoints. The crawling logic was carefully designed to avoid invalid, duplicate, or non-assessment URLs. This limitation is transparently acknowledged and discussed in the approach document.
 
 ---
 
 ## Embedding & Retrieval
 
-- Each assessment description is converted into a dense vector using:
+- Each assessment description was converted into a dense vector using:
 
-```
+  ```
+  sentence-transformers/all-MiniLM-L6-v2
+  ```
 
-sentence-transformers/all-MiniLM-L6-v2
+- All vectors were indexed using **FAISS (IndexFlatIP)** with cosine similarity.
+- Queries are embedded in the same vector space and matched against the index.
 
-```
-
-- All vectors are indexed using **FAISS (IndexFlatIP)** with **cosine similarity**
-- User queries are embedded in the same vector space and matched against the index
-
-### Why Semantic Search?
-
-This approach enables **intent-aware retrieval**, allowing the system to understand semantic meaning rather than relying on keyword matching.
+This approach enables **semantic retrieval**, allowing the system to understand intent rather than relying on keywords.
 
 ---
 
 ## Evaluation (Labeled Train Data)
 
-The provided **labeled training dataset** was used to evaluate recommendation quality.
+The provided **labeled train dataset** was used to evaluate recommendation quality.
 
 ### Metrics Used
 
@@ -118,41 +87,36 @@ The provided **labeled training dataset** was used to evaluate recommendation qu
 
 ### Evaluation Highlights
 
-- URLs across different SHL formats were **normalized using assessment slugs**
-- Results demonstrate **meaningful retrieval** of human-labeled relevant assessments
-- Evaluation implementation is available at:
+- URLs from different SHL formats were normalized using assessment slugs.
+- Results demonstrate meaningful retrieval of human-labeled relevant assessments.
+
+Evaluation code is available in:
 
 ```
-
 pipeline/evaluate.py
-
 ```
 
 ---
 
 ## Test Set Predictions
 
-Predictions were generated for the **unlabeled test queries**, as required by the assignment.
+Predictions were generated for the **unlabeled test queries**, as required.
 
 ### Output Format (Appendix-3 Compliant)
 
 ```
-
 Query,Assessment_url
 Query 1,URL 1
 Query 1,URL 2
 Query 2,URL 1
 ...
-
 ```
 
-📄 **Final Output File**
+📄 Output file:
 
 ```
-
 submission_predictions_final.csv
-
-````
+```
 
 ---
 
@@ -164,20 +128,23 @@ A **FastAPI backend** exposes the recommendation engine.
 
 #### Health Check
 
-**GET** `/health`
+```
+GET /health
+```
 
-**Response**
+Response:
+
 ```json
 { "status": "ok" }
-````
-
----
+```
 
 #### Recommendation Endpoint
 
-**POST** `/recommend`
+```
+POST /recommend
+```
 
-**Request**
+Request:
 
 ```json
 {
@@ -185,7 +152,7 @@ A **FastAPI backend** exposes the recommendation engine.
 }
 ```
 
-**Response**
+Response:
 
 ```json
 [
@@ -201,7 +168,7 @@ A **FastAPI backend** exposes the recommendation engine.
 ]
 ```
 
-📘 **Swagger UI**
+Swagger UI available at:
 
 ```
 http://127.0.0.1:8000/docs
@@ -211,7 +178,7 @@ http://127.0.0.1:8000/docs
 
 ## Web Frontend
 
-A lightweight **Streamlit frontend** is provided for interactive testing.
+A **simple Streamlit frontend** is provided to test the system interactively.
 
 ### Features
 
@@ -225,7 +192,7 @@ A lightweight **Streamlit frontend** is provided for interactive testing.
 python -m streamlit run frontend/app.py
 ```
 
-🌐 **Frontend URL**
+Frontend URL:
 
 ```
 http://localhost:8501
@@ -272,19 +239,19 @@ shl-assessment-recommendation-project/
 
 ## How to Run (Quick Start)
 
-### 1️⃣ Activate Virtual Environment
+1️⃣ Activate virtual environment
 
 ```bash
 venv\Scripts\activate
 ```
 
-### 2️⃣ Run API
+2️⃣ Run API
 
 ```bash
 python -m uvicorn api.app:app --reload
 ```
 
-### 3️⃣ Run Frontend
+3️⃣ Run Frontend
 
 ```bash
 python -m streamlit run frontend/app.py
@@ -297,29 +264,17 @@ python -m streamlit run frontend/app.py
 - Expand crawling to additional SHL catalogue entry points
 - Improve metadata extraction (duration, adaptive support, etc.)
 - Add reranking using cross-encoder models
-- Deploy API and frontend to cloud infrastructure
+- Deploy API & frontend to cloud infrastructure
 
 ---
 
 ## Conclusion
 
-This project demonstrates a **complete, production-style recommendation system**, covering:
-
-- Data ingestion
-- Semantic retrieval
-- Objective evaluation
-- API exposure
-- Frontend testing
-
-The solution closely follows **SHL’s specifications** while maintaining transparency around known data limitations.
+This project demonstrates a **complete, production-style recommendation system**, including data ingestion, semantic retrieval, evaluation, API exposure, and frontend testing.
+It follows SHL’s specifications closely while maintaining transparency around known limitations.
 
 ---
 
-## Author
-
-**Chandra Shekhar**
-GitHub: [csv1702](https://github.com/csv1702)
-
-```
-
-```
+**Author:**
+Chandra Shekhar
+GitHub: `csv1702`

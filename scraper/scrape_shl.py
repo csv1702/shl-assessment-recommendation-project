@@ -105,7 +105,7 @@ def scrape_assessment_links():
     with open(OUTPUT_PATH, "w", encoding="utf-8") as f:
         json.dump(sorted(collected_links), f, indent=2)
 
-    print("\n✅ STEP 4.3 COMPLETED SUCCESSFULLY")
+
     print(f"Total Individual Test Solutions collected: {len(collected_links)}")
 
 

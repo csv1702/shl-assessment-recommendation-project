@@ -36,7 +36,6 @@ def main():
     with open(OUTPUT_PATH, "w", encoding="utf-8") as f:
         json.dump(corpus, f, indent=2)
 
-    print("✅ STEP 5.1 completed")
     print(f"Total documents prepared: {len(corpus)}")
     print(f"Saved to: {OUTPUT_PATH}")
 
